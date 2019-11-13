@@ -1,0 +1,11 @@
+CREATE User(
+user_ID VARCHAR(5), u_name VARCHAR(30), u_pwd VARCHAR(30), is_admin BIT DEFAULT 0
+);
+
+CREATE MetaData(
+ID VARCHAR(5), file_size DECIMAL(4,0), date_added DATE, number_of_updates SMALLINT, user_ID VARCHAR(5), file_ID VARCHAR(5)
+);
+
+CREATE File(
+file_ID VARCHAR(5), file_content VARCHAR(30), file_location VARCHAR(30)
+);
