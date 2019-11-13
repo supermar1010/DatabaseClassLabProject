@@ -1,6 +1,5 @@
 let mysql = require('mysql');
-let fs = require('fs');
-
+let studentDbTesting = require('./studentDbTesting');
 let con;
 
 function start() {
@@ -15,46 +14,19 @@ function start() {
     con.connect(function (err) {
         if (err) throw err;
         console.log("Connected");
-        // createStudentTable();
-        // deleteById(53534);
-        // insertNewStudent();
-        // queryNewStudent();
-        // deleteById(53534);
+        studentDbTesting.createStudentTable(con);
+        studentDbTesting.deleteById(con, 53534);
+        studentDbTesting.insertNewStudent(con);
+        studentDbTesting.queryNewStudent(con);
+        studentDbTesting.deleteById(con, 53534);
+
     });
 }
 
-function insertNewStudent() {
-    let sql = "insert into student(ID, name, dept_name, tot_cred) VALUES(53534, \"Jonas Schrader\", \"Finance\", 86);";
-
-    con.query(sql, function (err, result) {
-        if (err) throw err;
-        console.log("Result: " + result);
-    });
+function saveFileToDb(file){
+    if(con.isConnected){
+        // Do stuff
+    }
 }
 
-function queryNewStudent() {
-    let sql = "Select * from student where id = 53534";
-    con.query(sql, function (err, result) {
-        if (err) throw err;
-        let name = result[0].name;
-        console.log("name: " + name);
-    });
-}
-
-function deleteById(id) {
-    let sql = `DELETE FROM student WHERE id = ${con.escape(id)}`;
-    con.query(sql, function (err, result) {
-        if (err) throw err;
-        console.log("Result: " + result[0]);
-    });
-}
-
-function createStudentTable() {
-    let sql = fs.readFileSync("./sql/createStudentDatabase.sql", "utf8");
-    con.query(sql, function (err, result) {
-        if (err) throw err;
-        console.log("Result: " + result);
-    });
-}
-
-module.exports = {start};
+module.exports = {start, saveFileToDb};
