@@ -1,3 +1,5 @@
+let fs = require('fs');
+
 function insertNewStudent(con) {
     let sql = "insert into student(ID, name, dept_name, tot_cred) VALUES(53534, \"Jonas Schrader\", \"Finance\", 86);";
 
@@ -33,4 +35,4 @@ function createStudentTable(con) {
 }
 
 
-module.exports = {insertNewStudent, queryNewStudent, deleteById, createStudentTable}
+module.exports = {insertNewStudent, queryNewStudent, deleteById, createStudentTable};
