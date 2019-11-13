@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>File storage</title>
+</head>
+<body>
+<form id='file-catcher'>
+  <input id='file-input' type='file' name="files" multiple/>
+  <button type='submit'>
+    Submit
+  </button>
+</form>
+
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+    (function () {
+        let fileCatcher = document.getElementById('file-catcher');
+        let fileInput = document.getElementById('file-input');
+        let fileList = [];
+        let sendFile;
+
+        fileCatcher.addEventListener('submit', function (evnt) {
+            evnt.preventDefault();
+            fileList.forEach(function (file) {
+                sendFile(file);
+            });
+        });
+
+        fileInput.addEventListener('change', function () {
+            fileList = [];
+            for (let i = 0; i < fileInput.files.length; i++) {
+                fileList.push(fileInput.files[i]);
+            }
+        });
+
+        sendFile = function (file) {
+            let request = new XMLHttpRequest();
+            request.open("POST", '/api/uploadFiles');
+
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => {
+                axios.post(`/api/uploadFiles`, { content:  reader.result, name: file.name, lastModified: file.lastModified});
+            };
+            reader.onerror = error => console.log(error);
+        };
+    })();
+</script>
+</body>
+</html>
