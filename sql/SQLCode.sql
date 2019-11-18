@@ -1,7 +1,7 @@
 CREATE User(
 ID INT AUTO_INCREMENT PRIMARY KEY,
-u_name VARCHAR(30) NOT NULL,
-u_pwd VARCHAR(30) NOT NULL,
+name VARCHAR(30) NOT NULL,
+pwd VARCHAR(30) NOT NULL,
 is_admin BIT DEFAULT 0,
 );
 
@@ -10,14 +10,14 @@ ID INT AUTO_INCREMENT PRIMARY KEY,
 file_size DECIMAL(4,0) NOT NULL,
 date_added INT,
 number_of_updates SMALLINT, 
-user_ID VARCHAR(5),
-file_ID VARCHAR(5),
+user_ID INT,
+file_ID INT,
 FOREIGN KEY (user_ID) REFERENCES User(ID),
 FOREIGN KEY (file_ID) REFERENCES File(ID)
 );
 
 CREATE File(
 ID INT AUTO_INCREMENT PRIMARY KEY,
-file_content VARCHAR(30),
-file_location VARCHAR(30),
+file_content LONGTEXT,
+file_location VARCHAR(100),
 );
