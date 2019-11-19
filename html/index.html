@@ -5,12 +5,6 @@
   <title>File storage</title>
 </head>
 <body>
-<form id='file-catcher'>
-  <input id='file-input' type='file' name="files" multiple/>
-  <button type='submit'>
-    Submit
-  </button>
-</form>
 
 <form id='sign-up'>
   <input id='sign-up-name-input' type='text' name="name"/>
@@ -28,12 +22,20 @@
   </button>
 </form>
 
+<form id='file-catcher' style="display: none">
+  <input id='file-input' type='file' name="files" multiple/>
+  <button type='submit'>
+    Upload
+  </button>
+</form>
+
 <script src="axios.js"></script>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
     (function () {
         handleFileUpload();
         handleLogin();
+        handleSignUp();
     })();
 
     function handleFileUpload() {
@@ -82,6 +84,7 @@
             axios
                 .post(`/api/login`, {username: username.value, password: password.value})
                 .then(response => {
+                    showAndHideStuff();
                     document.cookie = `jwt-token: ${response.data.token}`;
                 });
         });
@@ -90,14 +93,25 @@
     function handleSignUp() {
         let signUp = document.getElementById("sign-up");
         signUp.addEventListener('submit', function (evnt) {
+            evnt.preventDefault();
             let username = document.getElementById("sign-up-name-input");
             let password = document.getElementById("sign-up-password-input");
             axios
                 .post(`/api/signUp`, {username: username.value, password: password.value})
                 .then(response => {
+                    showAndHideStuff();
                     document.cookie = `jwt-token: ${response.data.token}`;
                 });
         });
+    }
+
+    function showAndHideStuff() {
+        let login = document.getElementById("login");
+        login.style.display = "none";
+        let signUp = document.getElementById("sign-up");
+        signUp.style.display = "none";
+        let fileCatcher = document.getElementById("file-catcher");
+        fileCatcher.style.display = "";
     }
 </script>
 </body>

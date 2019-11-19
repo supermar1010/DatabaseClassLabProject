@@ -23,7 +23,24 @@ async function uploadFiles(req, res) {
 }
 
 async function signUp(req, res) {
-
+    database.isUsernameUsed(req.body.username, (used) => {
+        if (!used) {
+            database.signUp(req.body.username, req.body.password, (success) =>{
+                if(success){
+                    let token = jwt.sign({username: req.body.username}, secret);
+                    console.log(token);
+                    res.send({token: token});
+                }
+                else {
+                    res.status(500);
+                    res.send({error: "Something went wrong please try again later"});
+                }
+            });
+        } else {
+            res.status(403);
+            res.send({error: "Invalid"});
+        }
+    });
 }
 
 function login(req, res) {
@@ -38,10 +55,6 @@ function login(req, res) {
             res.send({error: "Invalid"});
         }
     });
-}
-
-function isUserAdmin(username) {
-
 }
 
 class File {
