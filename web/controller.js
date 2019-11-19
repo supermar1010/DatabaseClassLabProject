@@ -1,5 +1,5 @@
 let path = require('path');
-let secret = "secret";
+let config = require("../config");
 let jwt = require('jsonwebtoken');
 let database = require("../database/main");
 
@@ -27,7 +27,7 @@ async function signUp(req, res) {
         if (!used) {
             database.signUp(req.body.username, req.body.password, (success) =>{
                 if(success){
-                    let token = jwt.sign({username: req.body.username}, secret);
+                    let token = jwt.sign({username: req.body.username}, config.secret);
                     console.log(token);
                     res.send({token: token});
                 }
@@ -47,7 +47,7 @@ function login(req, res) {
     database.checkCredentials(req.body.username, req.body.password, (result) => {
         if (result) {
             console.log("login successful");
-            let token = jwt.sign({username: req.body.username}, secret);
+            let token = jwt.sign({username: req.body.username}, config.secret);
             console.log(token);
             res.send({token: token});
         } else {

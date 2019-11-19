@@ -36,6 +36,10 @@
         handleFileUpload();
         handleLogin();
         handleSignUp();
+        console.log(document.cookie);
+        if(document.cookie.includes("jwt-token")){
+            showAndHideStuffAfterLogin();
+        }
     })();
 
     function handleFileUpload() {
@@ -84,7 +88,7 @@
             axios
                 .post(`/api/login`, {username: username.value, password: password.value})
                 .then(response => {
-                    showAndHideStuff();
+                    showAndHideStuffAfterLogin();
                     document.cookie = `jwt-token: ${response.data.token}`;
                 });
         });
@@ -99,13 +103,13 @@
             axios
                 .post(`/api/signUp`, {username: username.value, password: password.value})
                 .then(response => {
-                    showAndHideStuff();
+                    showAndHideStuffAfterLogin();
                     document.cookie = `jwt-token: ${response.data.token}`;
                 });
         });
     }
 
-    function showAndHideStuff() {
+    function showAndHideStuffAfterLogin() {
         let login = document.getElementById("login");
         login.style.display = "none";
         let signUp = document.getElementById("sign-up");
