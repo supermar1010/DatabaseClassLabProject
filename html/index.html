@@ -12,9 +12,31 @@
   </button>
 </form>
 
+<form id='sign-up'>
+  <input id='sign-up-name-input' type='text' name="name"/>
+  <input id='sign-up-password-input' type='password' name="password"/>
+  <button type='submit'>
+    Registrieren
+  </button>
+</form>
+
+<form id='login'>
+  <input id='login-name-input' type='text' name="name"/>
+  <input id='login-password-input' type='password' name="password"/>
+  <button type='submit'>
+    Login
+  </button>
+</form>
+
+<script src="axios.js"></script>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
     (function () {
+        handleFileUpload();
+        handleLogin();
+    })();
+
+    function handleFileUpload() {
         let fileCatcher = document.getElementById('file-catcher');
         let fileInput = document.getElementById('file-input');
         let fileList = [];
@@ -41,11 +63,42 @@
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = () => {
-                axios.post(`/api/uploadFiles`, { content:  reader.result, name: file.name, lastModified: file.lastModified});
+                axios.post(`/api/uploadFiles`, {
+                    content: reader.result,
+                    name: file.name,
+                    lastModified: file.lastModified
+                });
             };
             reader.onerror = error => console.log(error);
         };
-    })();
+    }
+
+    function handleLogin() {
+        let login = document.getElementById("login");
+        login.addEventListener('submit', function (evnt) {
+            evnt.preventDefault();
+            let username = document.getElementById("login-name-input");
+            let password = document.getElementById("login-password-input");
+            axios
+                .post(`/api/login`, {username: username.value, password: password.value})
+                .then(response => {
+                    document.cookie = `jwt-token: ${response.data.token}`;
+                });
+        });
+    }
+
+    function handleSignUp() {
+        let signUp = document.getElementById("sign-up");
+        signUp.addEventListener('submit', function (evnt) {
+            let username = document.getElementById("sign-up-name-input");
+            let password = document.getElementById("sign-up-password-input");
+            axios
+                .post(`/api/signUp`, {username: username.value, password: password.value})
+                .then(response => {
+                    document.cookie = `jwt-token: ${response.data.token}`;
+                });
+        });
+    }
 </script>
 </body>
 </html>
