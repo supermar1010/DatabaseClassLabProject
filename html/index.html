@@ -29,16 +29,21 @@
   </button>
 </form>
 
+<button id="logout">
+  Logout
+</button>
+
 <script src="axios.js"></script>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
     (function () {
         handleFileUpload();
         handleLogin();
+        handleLogout();
         handleSignUp();
         console.log(document.cookie);
-        if(document.cookie.includes("jwt-token")){
-            showAndHideStuffAfterLogin();
+        if (document.cookie.includes("jwt-token")) {
+            showAndHideStuffAfterLogin(true);
         }
     })();
 
@@ -88,10 +93,18 @@
             axios
                 .post(`/api/login`, {username: username.value, password: password.value})
                 .then(response => {
-                    showAndHideStuffAfterLogin();
+                    showAndHideStuffAfterLogin(true);
                     document.cookie = `jwt-token: ${response.data.token}`;
                 });
         });
+    }
+
+    function handleLogout() {
+        let logout = document.getElementById("logout");
+        logout.onclick = () => {
+            document.cookie = "";
+            showAndHideStuffAfterLogin(false);
+        };
     }
 
     function handleSignUp() {
@@ -103,19 +116,21 @@
             axios
                 .post(`/api/signUp`, {username: username.value, password: password.value})
                 .then(response => {
-                    showAndHideStuffAfterLogin();
+                    showAndHideStuffAfterLogin(true);
                     document.cookie = `jwt-token: ${response.data.token}`;
                 });
         });
     }
 
-    function showAndHideStuffAfterLogin() {
+    function showAndHideStuffAfterLogin(loggedIn) {
         let login = document.getElementById("login");
-        login.style.display = "none";
+        login.style.display = loggedIn ? "none" : "";
+        let logout = document.getElementById("logout");
+        logout.style.display = loggedIn ? "" : "none";
         let signUp = document.getElementById("sign-up");
-        signUp.style.display = "none";
+        signUp.style.display = loggedIn ? "none" : "";
         let fileCatcher = document.getElementById("file-catcher");
-        fileCatcher.style.display = "";
+        fileCatcher.style.display = loggedIn ? "" : "none";
     }
 </script>
 </body>
