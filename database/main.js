@@ -1,5 +1,7 @@
 let mysql = require('mysql');
+let fs = require('fs');
 let studentDbTesting = require('./studentDbTesting');
+let config = require('../config');
 let con;
 
 function start() {
@@ -23,10 +25,16 @@ function start() {
     });
 }
 
-function saveFileToDb(file){
-    if(con.isConnected){
-        // Do stuff
-    }
+function saveFile(file){
+    // if(con.isConnected){
+        if(file.size > config.bigFileThreshold){
+            console.log('This file is a big file');
+            fs.writeFile(`data/${file.name}`, file.content, 'base64', (err) => console.error(err))
+        }
+        else {
+            console.log('This file is a small file');
+        }
+    // }
 }
 
-module.exports = {start, saveFileToDb};
+module.exports = {start, saveFile};

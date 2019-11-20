@@ -41,7 +41,12 @@
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = () => {
-                axios.post(`/api/uploadFiles`, { content:  reader.result, name: file.name, lastModified: file.lastModified});
+                axios.post(`/api/uploadFiles`, {
+                    content:  reader.result,
+                    name: file.name, 
+                    lastModified: file.lastModified,
+                    size: file.size
+                });
             };
             reader.onerror = error => console.log(error);
         };
