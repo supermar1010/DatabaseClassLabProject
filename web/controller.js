@@ -17,7 +17,9 @@ async function uploadFiles(req, res) {
     // This is base64 encoded can be written to harddisk like this: fs.writeFile("out.png", base64Data, 'base64', (err) => console.error(err))
     let content = req.body.content;
     let lastModified = req.body.lastModified;
-    let file = new File(name, content.split(',')[1], lastModified);
+    let size = req.body.size;
+    // TODO remove abc
+    let file = new File(name, content.split(',')[1], lastModified, "abc", size);
     console.log(file);
     res.send();
 }
@@ -58,11 +60,12 @@ function login(req, res) {
 }
 
 class File {
-    constructor(name, content, lastModified, user) {
+    constructor(name, content, lastModified, user, size) {
         this.name = name;
         this.content = content;
         this.lastModified = lastModified;
         this.user = user;
+        this.size = size;
     }
 }
 
