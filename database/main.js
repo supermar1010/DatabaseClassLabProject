@@ -9,19 +9,24 @@ function start() {
         host: "localhost",
         user: "group13",
         password: "12345678",
-        database: "group13_production",
         multipleStatements: true
     });
 
-    con.connect(function (err) {
-        if (err) throw err;
+    con.connect(async function (err) {
+        if (err) {
+            throw err;
+        }
         console.log("Connected");
-        studentDbTesting.createStudentTable(con);
-        studentDbTesting.deleteById(con, 53534);
-        studentDbTesting.insertNewStudent(con);
-        studentDbTesting.queryNewStudent(con);
-        studentDbTesting.deleteById(con, 53534);
+        let sql = "Create Database IF NOT EXISTS group13_production";
+        await con.query(sql, (err) => {
+            if (err) throw err;
+            console.log("Created db");
+        });
 
+        await con.changeUser({database: 'group13_production'}, err => {
+            if (err) throw err;
+        });
+        initDb();
     });
 }
 
@@ -37,4 +42,48 @@ function saveFile(file){
     // }
 }
 
-module.exports = {start, saveFile};
+function initDb() {
+    let sql = fs.readFileSync("./sql/initDb.sql", "utf-8");
+    con.query(sql, function (err) {
+        if (err) throw err;
+
+    });
+}
+
+function saveFileToDb(file) {
+    if (con.isConnected) {
+        // Do stuff
+    }
+}
+
+function checkCredentials(username, password, callback) {
+    // result.length > 0
+    let sql = `Select id from User where name = ${con.escape(username)} and pwd=${con.escape(password)}`;
+    con.query(sql, function (err, result) {
+        if (err) throw err;
+        callback(result.length > 0);
+    });
+}
+
+function isUsernameUsed(username, callback) {
+    // result.length > 0
+    let sql = `Select id from User where name = ${con.escape(username)}`;
+    con.query(sql, function (err, result) {
+        if (err) throw err;
+        callback(result.length > 0);
+    });
+}
+
+function signUp(username, password, callback) {
+    let sql = `insert into User(name, pwd, is_admin) Values (${con.escape(username)}, ${con.escape(password)}, 0);`;
+    con.query(sql, err => {
+        if (err) {
+            callback(false);
+            throw err;
+        } else {
+            callback(true);
+        }
+    });
+}
+
+module.exports = {start, saveFile, checkCredentials, isUsernameUsed, signUp};
