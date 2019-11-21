@@ -18,8 +18,9 @@ async function uploadFiles(req, res) {
     let content = req.body.content;
     let lastModified = req.body.lastModified;
     let size = req.body.size;
-    // TODO remove abc
-    let file = new File(name, content.split(',')[1], lastModified, "abc", size);
+
+    let decoded = jwt.verify(req.cookies.auth, config.secret);
+    let file = new File(name, content.split(',')[1], lastModified, decoded.username, size);
     console.log(file);
     res.send();
 }
@@ -29,9 +30,7 @@ async function signUp(req, res) {
         if (!used) {
             database.signUp(req.body.username, req.body.password, (success) => {
                 if (success) {
-                    let token = jwt.sign({username: req.body.username}, config.secret);
-                    console.log(token);
-                    res.send({token: token});
+                    res.send({msg: "Success, please sign in"});
                 } else {
                     res.status(500);
                     res.send({error: "Something went wrong please try again later"});
@@ -47,7 +46,7 @@ async function signUp(req, res) {
 function login(req, res) {
     database.checkCredentials(req.body.username, req.body.password, (result) => {
         if (result > 0) {
-            console.log("login successful");
+            console.log("Login successful");
             let token = jwt.sign({username: req.body.username, accessLevel: result}, config.secret);
             console.log(token);
             res.send({token: token});
