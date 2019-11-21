@@ -44,10 +44,18 @@ function saveFileToDb(file) {
 
 function checkCredentials(username, password, callback) {
     // result.length > 0
-    let sql = `Select id from User where name = ${con.escape(username)} and pwd=${con.escape(password)}`;
+    let sql = `Select is_admin from User where name = ${con.escape(username)} and pwd=${con.escape(password)}`;
     con.query(sql, function (err, result) {
         if (err) throw err;
-        callback(result.length > 0);
+        if (result.length > 0) {
+            if (result[0].is_admin === 1) {
+                callback(2);
+            } else {
+                callback(1);
+            }
+        } else {
+            callback(0);
+        }
     });
 }
 

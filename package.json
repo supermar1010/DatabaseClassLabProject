@@ -20,6 +20,7 @@
   "homepage": "https://github.com/supermar1010/DatabaseClassLabProject#readme",
   "dependencies": {
     "body-parser": "latest",
+    "cookie-parser": "^1.4.4",
     "express": "^4.17.1",
     "express-fileupload": "^1.1.6-alpha.6",
     "jsonwebtoken": "^8.5.1",
