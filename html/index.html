@@ -10,7 +10,7 @@
   <input id='sign-up-name-input' type='text' name="name"/>
   <input id='sign-up-password-input' type='password' name="password"/>
   <button type='submit'>
-    Registrieren
+    Register
   </button>
 </form>
 
@@ -42,9 +42,7 @@
         handleLogout();
         handleSignUp();
         console.log(document.cookie);
-        if (document.cookie.includes("jwt-token")) {
-            showAndHideStuffAfterLogin(true);
-        }
+            showAndHideStuffLogin(document.cookie.includes("auth"));
     })();
 
     function handleFileUpload() {
@@ -75,10 +73,11 @@
             reader.readAsDataURL(file);
             reader.onload = () => {
                 axios.post(`/api/uploadFiles`, {
-                    content:  reader.result,
-                    name: file.name, 
+                    content: reader.result,
+                    name: file.name,
                     lastModified: file.lastModified,
-                    size: file.size
+                    size: file.size,
+                    token: document.cookie
                 });
             };
             reader.onerror = error => console.log(error);
@@ -94,8 +93,8 @@
             axios
                 .post(`/api/login`, {username: username.value, password: password.value})
                 .then(response => {
-                    showAndHideStuffAfterLogin(true);
-                    document.cookie = `jwt-token: ${response.data.token}`;
+                    showAndHideStuffLogin(true);
+                    document.cookie = `auth=${response.data.token}`;
                 });
         });
     }
@@ -103,8 +102,8 @@
     function handleLogout() {
         let logout = document.getElementById("logout");
         logout.onclick = () => {
-            document.cookie = "";
-            showAndHideStuffAfterLogin(false);
+            document.cookie = "auth=; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+            showAndHideStuffLogin(false);
         };
     }
 
@@ -117,13 +116,13 @@
             axios
                 .post(`/api/signUp`, {username: username.value, password: password.value})
                 .then(response => {
-                    showAndHideStuffAfterLogin(true);
-                    document.cookie = `jwt-token: ${response.data.token}`;
+                    showAndHideStuffLogin(true);
+                    document.cookie = `auth=${response.data.token}`;
                 });
         });
     }
 
-    function showAndHideStuffAfterLogin(loggedIn) {
+    function showAndHideStuffLogin(loggedIn) {
         let login = document.getElementById("login");
         login.style.display = loggedIn ? "none" : "";
         let logout = document.getElementById("logout");
