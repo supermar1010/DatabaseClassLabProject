@@ -31,7 +31,7 @@ function start() {
 }
 
 function saveFile(file){
-    // if(con.isConnected){
+    if(con.isConnected){
         if(file.size > config.bigFileThreshold){
             console.log('This file is a big file');
             fs.writeFile(`data/${file.name}`, file.content, 'base64', (err) => console.error(err))
@@ -39,7 +39,7 @@ function saveFile(file){
         else {
             console.log('This file is a small file');
         }
-    // }
+    }
 }
 
 function initDb() {
@@ -48,12 +48,6 @@ function initDb() {
         if (err) throw err;
 
     });
-}
-
-function saveFileToDb(file) {
-    if (con.isConnected) {
-        // Do stuff
-    }
 }
 
 function checkCredentials(username, password, callback) {
