@@ -23,22 +23,38 @@ function start() {
             console.log("Created db");
         });
 
-        await con.changeUser({database: 'group13_production'}, err => {
+        await con.changeUser({ database: 'group13_production' }, err => {
             if (err) throw err;
         });
         initDb();
     });
 }
 
-function saveFile(file){
-    if(con.isConnected){
-        if(file.size > config.bigFileThreshold){
-            console.log('This file is a big file');
-            fs.writeFile(`data/${file.name}`, file.content, 'base64', (err) => console.error(err))
-        }
-        else {
-            console.log('This file is a small file');
-        }
+function saveFile(file) {
+    let userId;
+    let sqluser = `select ID from user where name = "${file.user}"`;
+    con.query(sqluser, function (err, result) {
+        if (err) throw err;
+        userId = result[0].ID;
+        console.log(userId);
+    });
+    if (file.size > config.bigFileThreshold) {
+        console.log('This file is a big file');
+        let sql = `insert into File(file_content, file_location) VALUES(null, "${file.name}");`;
+        con.query(sql, function (err, result) {
+            if (err) throw err;
+            let fileId = result.insertId;
+            console.log("fileId: " + fileId);
+            let sqlMetadata = `insert into MetaData(file_size, date_added, number_of_updates, user_ID, file_ID) 
+                Values(${file.size}, ${file.lastModified}, 0, ${userId}, ${fileId} );`;
+            con.query(sqlMetadata, function (err, result) {
+                if (err) throw err;
+            })
+        });
+        fs.writeFile(`data/${file.name}`, file.content, 'base64', (err) => console.error(err))
+    }
+    else {
+        console.log('This file is a small file');
     }
 }
 
@@ -88,4 +104,4 @@ function signUp(username, password, callback) {
     });
 }
 
-module.exports = {start, saveFile, checkCredentials, isUsernameUsed, signUp};
+module.exports = { start, saveFile, checkCredentials, isUsernameUsed, signUp };

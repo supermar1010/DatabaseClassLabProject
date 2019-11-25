@@ -21,7 +21,6 @@ async function uploadFiles(req, res) {
 
     let decoded = jwt.verify(req.cookies.auth, config.secret);
     let file = new File(name, content.split(',')[1], lastModified, decoded.username, size);
-    console.log(file);
     res.send();
     database.saveFile(file);
 }
