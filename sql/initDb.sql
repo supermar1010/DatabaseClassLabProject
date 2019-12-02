@@ -13,8 +13,8 @@ file_location VARCHAR(100)
 
 CREATE TABLE IF NOT EXISTS MetaData(
 ID INT AUTO_INCREMENT PRIMARY KEY,
-file_size DECIMAL(4,0) NOT NULL,
-date_added INT,
+file_size BIGINT NOT NULL,
+date_added BIGINT,
 number_of_updates SMALLINT,
 user_ID INT,
 file_ID INT,
