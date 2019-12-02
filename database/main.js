@@ -30,51 +30,6 @@ function start() {
     });
 }
 
-function saveFile(file) {
-    let userId;
-    let sqluser = `select ID from User where name = "${con.escape(file.user)}"`;
-    con.query(sqluser, function (err, result) {
-        if (err) throw err;
-        userId = result[0].ID;
-        console.log(userId);
-    });
-    if (file.size > config.bigFileThreshold) {
-        console.log('This file is a big file');
-        let sql = `insert into File(file_content, file_location) VALUES(null, "${con.escape(file.name)}");`;
-        con.query(sql, function (err, result) {
-            if (err) throw err;
-            let fileId = result.insertId;
-            console.log("fileId: " + fileId);
-            let sqlMetadata = `insert into MetaData(file_size, date_added, number_of_updates, user_ID, file_ID) 
-                Values(${con.escape(file.size)}, ${con.escape(file.lastModified)}, 0, ${userId}, ${fileId} );`;
-            con.query(sqlMetadata, function (err, result) {
-                if (err) throw err;
-            })
-        });
-
-        let dir = 'data';
-        if (!fs.existsSync(dir)) {
-            fs.mkdirSync(dir);
-        }
-        fs.writeFile(`data/${file.name}`, file.content, 'base64', (err) => console.error(err))
-    } else {
-        console.log('This file is a small file');
-        let sql = `insert into File(file_content, file_location) VALUES("${con.escape(file.content)}", "${con.escape(file.name)}");`;
-
-        con.query(sql, function (err, result) {
-            if (err) throw err;
-            let fileId = result.insertId;
-            console.log("fileId: " + fileId);
-            let sqlMetadata = `insert into MetaData(file_size, date_added, number_of_updates, user_ID, file_ID) 
-                Values(${con.escape(file.size)}, ${con.escape(file.lastModified)}, 0, ${userId}, ${fileId} );`;
-            con.query(sqlMetadata, function (err, result) {
-                if (err) throw err;
-            })
-        });
-    }
-}
-
-
 function initDb() {
     let sql = fs.readFileSync("./sql/initDb.sql", "utf-8");
     con.query(sql, function (err) {
@@ -82,8 +37,45 @@ function initDb() {
     });
 }
 
+function saveFile(file) {
+    let userId;
+    let sqluser = `select ID from User where name = "${con.escape(file.user)}"`;
+    con.query(sqluser, function (err, result) {
+        if (err) throw err;
+        userId = result[0].ID;
+    });
+
+    let sql = "";
+    if (file.size > config.bigFileThreshold) {
+        console.log('This file is a big file');
+        sql = `insert into File(file_content, file_location) VALUES(null, "${con.escape(file.name)}");`;
+        writeFileToHarddisk(file);
+    } else {
+        console.log('This file is a small file');
+        sql = `insert into File(file_content, file_location) VALUES("${con.escape(file.content)}", "${con.escape(file.name)}");`;
+    }
+
+    con.query(sql, function (err, result) {
+        if (err) throw err;
+        let fileId = result.insertId;
+        console.log("fileId: " + fileId);
+        let sqlMetadata = `insert into MetaData(file_size, date_added, number_of_updates, user_ID, file_ID) 
+                Values(${con.escape(file.size)}, ${con.escape(file.lastModified)}, 0, ${userId}, ${fileId} );`;
+        con.query(sqlMetadata, function (err, result) {
+            if (err) throw err;
+        })
+    });
+}
+
+function writeFileToHarddisk(file) {
+    let dir = 'data';
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir);
+    }
+    fs.writeFile(`data/${file.name}`, file.content, 'base64', (err) => console.error(err))
+}
+
 function checkCredentials(username, password, callback) {
-    // result.length > 0
     let sql = `Select is_admin from User where name = ${con.escape(username)} and pwd=${con.escape(password)}`;
     con.query(sql, function (err, result) {
         if (err) throw err;
@@ -100,7 +92,6 @@ function checkCredentials(username, password, callback) {
 }
 
 function isUsernameUsed(username, callback) {
-    // result.length > 0
     let sql = `Select id from User where name = ${con.escape(username)}`;
     con.query(sql, function (err, result) {
         if (err) throw err;
