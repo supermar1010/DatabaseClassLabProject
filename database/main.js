@@ -1,6 +1,5 @@
 let mysql = require('mysql');
 let fs = require('fs');
-let studentDbTesting = require('./studentDbTesting');
 let config = require('../config');
 let con;
 
@@ -39,20 +38,20 @@ function initDb() {
 
 function saveFile(file) {
     let userId;
-    let sqlUser = `select ID from User where name = "${con.escape(file.user)}"`;
+    let sqlUser = `select ID from User where name = ${con.escape(file.user)}`;
     con.query(sqlUser, function (err, result) {
         if (err) throw err;
         userId = result[0].ID;
     });
 
-    let sqlInsertFile = "";
+    let sqlInsertFile;
     if (file.size > config.bigFileThreshold) {
         console.log('This file is a big file');
-        sqlInsertFile = `insert into File(file_content, file_location) VALUES(null, "${con.escape(file.name)}");`;
+        sqlInsertFile = `insert into File(file_content, file_location) VALUES(null, ${con.escape(file.name)});`;
         writeFileToHarddisk(file);
     } else {
         console.log('This file is a small file');
-        sqlInsertFile = `insert into File(file_content, file_location) VALUES("${con.escape(file.content)}", "${con.escape(file.name)}");`;
+        sqlInsertFile = `insert into File(file_content, file_location) VALUES(${con.escape(file.content)}, ${con.escape(file.name)});`;
     }
 
     con.query(sqlInsertFile, function (err, result) {
