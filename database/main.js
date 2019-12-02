@@ -63,7 +63,7 @@ function saveFile(file)
     else 
     {
         console.log('This file is a small file');
-        let sql = `insert into File(file_content, file_location) VALUES(null, "${file.name}");`;
+        let sql = `insert into File(file_content, file_location) VALUES("database", "${file.name}");`;
 
         con.query(sql, function (err, result) 
         {
@@ -77,13 +77,6 @@ function saveFile(file)
                 if (err) throw err;
             })
         });
-        var fs = require('fs');
-        var dir = 'smallfile';
-        
-        if (!fs.existsSync(dir)){
-            fs.mkdirSync(dir);
-        }
-        fs.writeFile(`smallfile/${file.name}`, file.content, 'base64', (err) => console.error(err))
     }
 }
 
