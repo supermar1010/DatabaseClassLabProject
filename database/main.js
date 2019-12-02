@@ -39,29 +39,29 @@ function initDb() {
 
 function saveFile(file) {
     let userId;
-    let sqluser = `select ID from User where name = "${con.escape(file.user)}"`;
-    con.query(sqluser, function (err, result) {
+    let sqlUser = `select ID from User where name = "${con.escape(file.user)}"`;
+    con.query(sqlUser, function (err, result) {
         if (err) throw err;
         userId = result[0].ID;
     });
 
-    let sql = "";
+    let sqlInsertFile = "";
     if (file.size > config.bigFileThreshold) {
         console.log('This file is a big file');
-        sql = `insert into File(file_content, file_location) VALUES(null, "${con.escape(file.name)}");`;
+        sqlInsertFile = `insert into File(file_content, file_location) VALUES(null, "${con.escape(file.name)}");`;
         writeFileToHarddisk(file);
     } else {
         console.log('This file is a small file');
-        sql = `insert into File(file_content, file_location) VALUES("${con.escape(file.content)}", "${con.escape(file.name)}");`;
+        sqlInsertFile = `insert into File(file_content, file_location) VALUES("${con.escape(file.content)}", "${con.escape(file.name)}");`;
     }
 
-    con.query(sql, function (err, result) {
+    con.query(sqlInsertFile, function (err, result) {
         if (err) throw err;
         let fileId = result.insertId;
         console.log("fileId: " + fileId);
-        let sqlMetadata = `insert into MetaData(file_size, date_added, number_of_updates, user_ID, file_ID) 
+        let sqlInsertMetadata = `insert into MetaData(file_size, date_added, number_of_updates, user_ID, file_ID) 
                 Values(${con.escape(file.size)}, ${con.escape(file.lastModified)}, 0, ${userId}, ${fileId} );`;
-        con.query(sqlMetadata, function (err, result) {
+        con.query(sqlInsertMetadata, function (err, result) {
             if (err) throw err;
         })
     });
