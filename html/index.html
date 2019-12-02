@@ -5,16 +5,47 @@
   <title>File storage</title>
 </head>
 <body>
-<form id='file-catcher'>
-  <input id='file-input' type='file' name="files" multiple/>
+
+<form id='sign-up'>
+  <input id='sign-up-name-input' type='text' name="name"/>
+  <input id='sign-up-password-input' type='password' name="password"/>
   <button type='submit'>
-    Submit
+    Register
   </button>
 </form>
 
+<form id='login'>
+  <input id='login-name-input' type='text' name="name"/>
+  <input id='login-password-input' type='password' name="password"/>
+  <button type='submit'>
+    Login
+  </button>
+</form>
+
+<form id='file-catcher' style="display: none">
+  <input id='file-input' type='file' name="files" multiple/>
+  <button type='submit'>
+    Upload
+  </button>
+</form>
+
+<button id="logout">
+  Logout
+</button>
+
+<script src="axios.js"></script>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
     (function () {
+        handleFileUpload();
+        handleLogin();
+        handleLogout();
+        handleSignUp();
+        console.log(document.cookie);
+            showAndHideStuffLogin(document.cookie.includes("auth"));
+    })();
+
+    function handleFileUpload() {
         let fileCatcher = document.getElementById('file-catcher');
         let fileInput = document.getElementById('file-input');
         let fileList = [];
@@ -41,11 +72,66 @@
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = () => {
-                axios.post(`/api/uploadFiles`, { content:  reader.result, name: file.name, lastModified: file.lastModified});
+                axios.post(`/api/uploadFiles`, {
+                    content: reader.result,
+                    name: file.name,
+                    lastModified: file.lastModified,
+                    size: file.size,
+                    token: document.cookie
+                });
             };
             reader.onerror = error => console.log(error);
         };
-    })();
+    }
+
+    function handleLogin() {
+        let login = document.getElementById("login");
+        login.addEventListener('submit', function (evnt) {
+            evnt.preventDefault();
+            let username = document.getElementById("login-name-input");
+            let password = document.getElementById("login-password-input");
+            axios
+                .post(`/api/login`, {username: username.value, password: password.value})
+                .then(response => {
+                    showAndHideStuffLogin(true);
+                    document.cookie = `auth=${response.data.token}`;
+                });
+        });
+    }
+
+    function handleLogout() {
+        let logout = document.getElementById("logout");
+        logout.onclick = () => {
+            document.cookie = "auth=; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+            showAndHideStuffLogin(false);
+        };
+    }
+
+    function handleSignUp() {
+        let signUp = document.getElementById("sign-up");
+        signUp.addEventListener('submit', function (evnt) {
+            evnt.preventDefault();
+            let username = document.getElementById("sign-up-name-input");
+            let password = document.getElementById("sign-up-password-input");
+            axios
+                .post(`/api/signUp`, {username: username.value, password: password.value})
+                .then(response => {
+                    showAndHideStuffLogin(true);
+                    document.cookie = `auth=${response.data.token}`;
+                });
+        });
+    }
+
+    function showAndHideStuffLogin(loggedIn) {
+        let login = document.getElementById("login");
+        login.style.display = loggedIn ? "none" : "";
+        let logout = document.getElementById("logout");
+        logout.style.display = loggedIn ? "" : "none";
+        let signUp = document.getElementById("sign-up");
+        signUp.style.display = loggedIn ? "none" : "";
+        let fileCatcher = document.getElementById("file-catcher");
+        fileCatcher.style.display = loggedIn ? "" : "none";
+    }
 </script>
 </body>
 </html>
